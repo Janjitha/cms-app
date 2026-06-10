@@ -49,21 +49,19 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) /// Spring needs this for POST,PUT & DELETE
-                //.csrf(ref->ref.disable())
                 .authorizeHttpRequests(authorize -> authorize
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/auth/login").authenticated()
+                                .requestMatchers(HttpMethod.GET, "api/auth/user-details").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/api/officer/add").permitAll()
-
                                 .requestMatchers(HttpMethod.GET, "/api/station/by-incident/{incidentId}").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/incident/suspect/by-incident/{incidentId}").authenticated()
                                 .requestMatchers(HttpMethod.GET, "/api/incident/all/v2").hasAuthority("OFFICER")
                                 .requestMatchers(HttpMethod.GET, "/api/incident/get-one/{id}").hasAnyAuthority("OFFICER", "STATION_HEAD")
                                 .requestMatchers(HttpMethod.POST, "/api/incident/add/v2/{officerId}").hasAuthority("OFFICER")
                                 .requestMatchers(HttpMethod.GET, "/api/incident/get/officer/{officerId}").hasAuthority("STATION_HEAD")
-
                                 .requestMatchers(HttpMethod.GET, "/api/officer/by-incident/stat").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/incident/stat/by-type").permitAll()
-
                                 .requestMatchers(HttpMethod.POST, "/api/officer/id/upload").hasAuthority("OFFICER")
                                 .anyRequest().authenticated()
 
